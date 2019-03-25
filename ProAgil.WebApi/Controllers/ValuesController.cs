@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ProAgil.WebApi.Models;
 
 namespace ProAgil.WebApi.Controllers
 {
@@ -12,9 +13,26 @@ namespace ProAgil.WebApi.Controllers
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<IEnumerable<Evento>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new Evento[] { 
+                new Evento(){
+                    EventoId = 1, 
+                    Tema = "Angular e .NET",
+                    Local = "Bauru",
+                    Lote = "1º LOTE",
+                    QtdPessoas = 100,
+                    DataEvento = DateTime.Now.AddDays(5).ToString("dd/MM/yyyy")
+                }, 
+                new Evento(){
+                    EventoId = 2, 
+                    Tema = "Angular e novidades",
+                    Local = "São Paulo",
+                    Lote = "2º LOTE",
+                    QtdPessoas = 300,
+                    DataEvento = DateTime.Now.AddDays(7).ToString("dd/MM/yyyy")
+                },
+             };
         }
 
         // GET api/values/5
