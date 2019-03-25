@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProAgil.WebApi.Data;
 using ProAgil.WebApi.Models;
 
 namespace ProAgil.WebApi.Controllers
@@ -11,35 +14,39 @@ namespace ProAgil.WebApi.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        public DataContext Context;
+        public ValuesController(DataContext context)
+        {
+            this.Context = context;
+
+        }
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<Evento>> Get()
+        public  async Task<IActionResult> Get()
         {
-            return new Evento[] { 
-                new Evento(){
-                    EventoId = 1, 
-                    Tema = "Angular e .NET",
-                    Local = "Bauru",
-                    Lote = "1º LOTE",
-                    QtdPessoas = 100,
-                    DataEvento = DateTime.Now.AddDays(5).ToString("dd/MM/yyyy")
-                }, 
-                new Evento(){
-                    EventoId = 2, 
-                    Tema = "Angular e novidades",
-                    Local = "São Paulo",
-                    Lote = "2º LOTE",
-                    QtdPessoas = 300,
-                    DataEvento = DateTime.Now.AddDays(7).ToString("dd/MM/yyyy")
-                },
-             };
+            try
+            {
+                var results = await Context.Eventos.ToListAsync();
+                return Ok(results);
+            }
+            catch(System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Erro interno");
+            }
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return "value";
+            try
+            {
+                return Ok(Context.Eventos.FirstOrDefaultAsync(e => e.EventoId == id));
+            }
+            catch(System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Erro interno");
+            }
         }
 
         // POST api/values
