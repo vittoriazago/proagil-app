@@ -6,8 +6,14 @@
   </div>
 </form>
 <table class="table table-striped">
-  <thead class="thead-dark">
+  <thead class="thead-ligth">
     <tr>
+      <th>
+        <button class="btn btn-outline-prim"
+        (click)="alternarImagem()">
+          Mostrar imagem
+        </button>
+      </th>
       <th>#</th>
       <th>Tema</th>
       <th>Local</th>
@@ -19,6 +25,12 @@
   </thead>
   <tbody *ngIf="eventos && eventos.length">
     <tr *ngFor="let evento of eventos">
+      <td>
+        <img *ngIf="mostrarImagem"
+        src="http://localhost:5000/img/{{evento.imagemUrl}}"
+        [style.width.px]="imagemLargura"
+        [style.margin.px]="imagemMargem">        
+      </td>
       <td>{{evento.eventoId}}</td>
       <td>{{evento.tema}}</td>
       <td>{{evento.local}}</td>
