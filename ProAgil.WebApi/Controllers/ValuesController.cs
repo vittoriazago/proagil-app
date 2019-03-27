@@ -26,7 +26,10 @@ namespace ProAgil.WebApi.Controllers
         {
             try
             {
-                var results = await Context.Eventos.ToListAsync();
+                var results = await Context.Eventos
+                                    .Where(d => d.Email =="")
+                                    .Include(x => x.PalestrantesEventos)
+                                    .ToListAsync();
                 return Ok(results);
             }
             catch(System.Exception)
