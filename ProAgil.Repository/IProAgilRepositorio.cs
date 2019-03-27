@@ -12,8 +12,9 @@ namespace ProAgil.Repository
          void Delete(T entity);
          Task<bool> SaveChangesAsync();
          
-         IEnumerable<T> GetList();
-         Task<IEnumerable<T>> GetListFilterAsync(Expression<Func<T, bool>> filter);
+         Task<IEnumerable<T>> GetListAsync(params Expression<Func<T, object>>[] includes);
+         Task<IEnumerable<T>> GetListFilterAsync(Expression<Func<T, bool>> filter,
+                    params Expression<Func<T, object>>[] includes);
 
     }
 }

@@ -32,16 +32,29 @@ namespace ProAgil.Repository
             _context.Remove(entity);
         }
 
-        public IEnumerable<T> GetList()
+        public async Task<IEnumerable<T>> GetListAsync(
+            params Expression<Func<T, object>>[] includes)
         {
-            return _context.Set<T>();
+            var list = _context.Set<T>().AsQueryable();
+            if (includes != null)
+            {
+                list = includes.Aggregate(list,
+                        (current, include) => current.Include(include));
+            }
+            return await list.ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetListFilterAsync(Expression<Func<T, bool>> filter)
+        public async Task<IEnumerable<T>> GetListFilterAsync(
+            Expression<Func<T, bool>> filter,
+            params Expression<Func<T, object>>[] includes)
         {
             var list = _context.Set<T>().Where(filter);
-
-            return list;
+            if (includes != null)
+            {
+                list = includes.Aggregate(list,
+                        (current, include) => current.Include(include));
+            }
+            return await list.ToListAsync();
         }
 
         public async Task<bool> SaveChangesAsync()
