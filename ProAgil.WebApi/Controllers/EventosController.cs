@@ -7,29 +7,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProAgil.Repository.Data;
 using ProAgil.Domain;
+using ProAgil.Repository;
 
 namespace ProAgil.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class EventosController : ControllerBase
     {
-        public ProAgilContext Context;
-        public ValuesController(ProAgilContext context)
+        private readonly IProAgilRepositorio<Evento> _repository;
+        public EventosController(IProAgilRepositorio<Evento> repositorio)
         {
-            this.Context = context;
-
+            _repository = repositorio;
         }
-        // GET api/values
+        
+        // GET api/eventos
         [HttpGet]
         public  async Task<IActionResult> Get()
         {
             try
             {
-                var results = await Context.Eventos
-                                    .Where(d => d.Email =="")
-                                    .Include(x => x.PalestrantesEventos)
-                                    .ToListAsync();
+                var results = await _repository.GetListFilterAsync
+                                    (d => d.Email =="",
+                                     x => x.PalestrantesEventos);
                 return Ok(results);
             }
             catch(System.Exception)
@@ -38,13 +38,13 @@ namespace ProAgil.WebApi.Controllers
             }
         }
 
-        // GET api/values/5
+        // GET api/eventos/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try
             {
-                return Ok(Context.Eventos.FirstOrDefaultAsync(e => e.Id == id));
+                return Ok(_repository.GetListFilterAsync(e => e.Id == id));
             }
             catch(System.Exception)
             {
@@ -52,19 +52,19 @@ namespace ProAgil.WebApi.Controllers
             }
         }
 
-        // POST api/values
+        // POST api/eventos
         [HttpPost]
         public void Post([FromBody] string value)
         {
         }
 
-        // PUT api/values/5
+        // PUT api/eventos/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/values/5
+        // DELETE api/eventos/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
