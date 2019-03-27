@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ProAgil.Repository;
 using ProAgil.Repository.Data;
 
 namespace ProAgil.WebApi
@@ -30,6 +31,7 @@ namespace ProAgil.WebApi
             services.AddDbContext<ProAgilContext>(
                 x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
             );
+            services.AddScoped(typeof(IProAgilRepositorio<>), typeof(ProAgilRepository<>));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddCors();
         }

@@ -20,16 +20,15 @@ namespace ProAgil.WebApi.Controllers
         {
             _repository = repositorio;
         }
-        
+
         // GET api/eventos
         [HttpGet]
         public  async Task<IActionResult> Get()
         {
             try
             {
-                var results = await _repository.GetListFilterAsync
-                                    (d => d.Email =="",
-                                     x => x.PalestrantesEventos);
+                var results = await _repository.GetListAsync
+                                    (x => x.PalestrantesEventos);
                 return Ok(results);
             }
             catch(System.Exception)
@@ -44,7 +43,9 @@ namespace ProAgil.WebApi.Controllers
         {
             try
             {
-                return Ok(_repository.GetListFilterAsync(e => e.Id == id));
+                var result = await _repository.GetListFilterAsync(e => e.Id == id);
+                            
+                return Ok(result.FirstOrDefault());
             }
             catch(System.Exception)
             {
@@ -54,20 +55,58 @@ namespace ProAgil.WebApi.Controllers
 
         // POST api/eventos
         [HttpPost]
-        public void Post([FromBody] string value)
-        {
+        public async Task<IActionResult> Post([FromBody] Evento evento)
+        { 
+            try
+            {
+                _repository.Add(evento);
+                await _repository.SaveChangesAsync();            
+                return Created($"/api/evento/{evento.Id}", evento);
+            }
+            catch(System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Erro interno");
+            }
         }
 
         // PUT api/eventos/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
+        public async Task<IActionResult> Put(int id, [FromBody] string value)
+        { 
+            try
+            {
+                var evento = (await _repository.GetListFilterAsync(e => e.Id == id)).FirstOrDefault();
+                if(evento == null)
+                    return NotFound("Evento não localizado");
+
+                _repository.Update(evento);
+                await _repository.SaveChangesAsync();            
+                return Created($"/api/evento/{evento.Id}", evento);
+            }
+            catch(System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Erro interno");
+            }
         }
 
         // DELETE api/eventos/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            try
+            {
+                 var evento = (await _repository.GetListFilterAsync(e => e.Id == id)).FirstOrDefault();
+                if(evento == null)
+                    return NotFound("Evento não localizado");
+
+                _repository.Delete(evento);
+                await _repository.SaveChangesAsync();           
+                return Ok();
+            }
+            catch(System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Erro interno");
+            }
         }
     }
 }
