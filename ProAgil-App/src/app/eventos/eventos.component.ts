@@ -24,6 +24,7 @@ export class EventosComponent implements OnInit {
   mostrarImagem = false;
   modalRef: BsModalRef;
   registerForm: FormGroup;
+  modoSalvar = 'post';
 
   _filtroLista = '';
 
@@ -38,8 +39,16 @@ export class EventosComponent implements OnInit {
   ngOnInit() {
     this.validation();
     this.getEventos();
+  } 
+  editarEvento(evento: Evento, template: any) {
+    this.modoSalvar = 'put';
+    this.openModal(template);
+    this.evento = evento;
+    this.registerForm.patchValue(evento);
   }
-
+  novoEvento(template: any) {
+    this.openModal(template);
+  }
   openModal(template: any) {
     this.registerForm.reset();
     template.show();
@@ -67,15 +76,27 @@ export class EventosComponent implements OnInit {
 
   salvarAlteracao(template: any) {
     if (this.registerForm.valid) {
-      this.evento = Object.assign({}, this.registerForm.value);
-      this.eventoService.postEvento(this.evento).subscribe(
-        (novoEvento: Evento) => {
-          template.hide();
-          this.getEventos();
-        }, error => {
-          console.log(error);
-        }
-      );
+      if (this.modoSalvar === 'post') {
+        this.evento = Object.assign({}, this.registerForm.value);
+        this.eventoService.postEvento(this.evento).subscribe(
+          (novoEvento: Evento) => {
+            template.hide();
+            this.getEventos();
+          }, error => {
+            console.log(error);
+          }
+        );
+      } else {
+        this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+        this.eventoService.putEvento(this.evento).subscribe(
+          (novoEvento: Evento) => {
+            template.hide();
+            this.getEventos();
+          }, error => {
+            console.log(error);
+          }
+        );
+      }
     }
   }
   validation() {
