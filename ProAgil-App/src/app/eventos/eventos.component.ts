@@ -65,9 +65,7 @@ export class EventosComponent implements OnInit {
         this.getEventos();
         this.toastr.success('Deletado com sucesso!');
       }, error => {
-        this.toastr.success('Erro ao deletar!');
-
-        console.log(error);
+        this.toastr.error('Erro ao deletar!');
       }
     );
   }
@@ -106,7 +104,7 @@ export class EventosComponent implements OnInit {
             this.getEventos();
             this.toastr.success('Inserido com sucesso!');
           }, error => {
-            this.toastr.error('Erro ao inserir!');
+            this.toastr.error(`Erro ao inserir ${error}!`);
           }
         );
       } else {
@@ -117,7 +115,7 @@ export class EventosComponent implements OnInit {
             this.getEventos();
             this.toastr.success('Atualizado com sucesso!');
           }, error => {
-            this.toastr.error('Erro ao atualizar!');
+            this.toastr.error(`Erro ao atualizar ${error}!`);
           }
         );
       }
@@ -141,7 +139,7 @@ export class EventosComponent implements OnInit {
         this.eventos = _eventos;
         this.eventosFiltrados = this.eventos;
       }, error => {
-        console.log(error);
+        this.toastr.error(`Erro ao carregar eventos ${error}!`);
       }
     );
   }
