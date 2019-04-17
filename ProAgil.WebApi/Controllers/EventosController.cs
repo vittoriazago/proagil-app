@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using ProAgil.Repository.Data;
 using ProAgil.Domain;
 using ProAgil.Repository;
+using ProAgil.WebApi.Models;
+using AutoMapper;
 
 namespace ProAgil.WebApi.Controllers
 {
@@ -15,9 +17,13 @@ namespace ProAgil.WebApi.Controllers
     [ApiController]
     public class EventosController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IProAgilRepositorio<Evento> _repository;
-        public EventosController(IProAgilRepositorio<Evento> repositorio)
+        
+        public EventosController(IMapper mapper,
+            IProAgilRepositorio<Evento> repositorio)
         {
+            _mapper = mapper;
             _repository = repositorio;
         }
 
@@ -25,16 +31,12 @@ namespace ProAgil.WebApi.Controllers
         [HttpGet]
         public  async Task<IActionResult> Get()
         {
-            try
-            {
-                var results = await _repository.GetListAsync
-                                    (x => x.PalestrantesEventos);
-                return Ok(results);
-            }
-            catch(System.Exception)
-            {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Erro interno");
-            }
+                var results = await _repository.GetListAsync(
+                                        x => x.PalestrantesEventos);
+                                     //.ThenInclude(x => x.Palestrante);
+                var eventos = _mapper.Map<IEnumerable<EventoViewDto>>(results);
+                return Ok(eventos);
+            
         }
 
         // GET api/eventos/5
@@ -55,33 +57,32 @@ namespace ProAgil.WebApi.Controllers
 
         // POST api/eventos
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Evento evento)
-        { 
-            try
-            {
-                _repository.Add(evento);
+        public async Task<IActionResult> Post([FromBody] Evento eventoNovo)
+        {     
+          
+                //var evento = _mapper.Map<Evento>(eventoNovo);
+                
+                _repository.Add(eventoNovo);
                 await _repository.SaveChangesAsync();            
-                return Created($"/api/evento/{evento.Id}", evento);
-            }
-            catch(System.Exception)
-            {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Erro interno");
-            }
+                return Created($"/api/evento/{eventoNovo.Id}", eventoNovo);
+            
         }
 
         // PUT api/eventos/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] string value)
-        { 
+        public async Task<IActionResult> Put(int id, [FromBody] Evento eventoEdit)
+        {             
             try
             {
                 var evento = (await _repository.GetListFilterAsync(e => e.Id == id)).FirstOrDefault();
                 if(evento == null)
                     return NotFound("Evento não localizado");
 
+                evento.Telefone = eventoEdit.Telefone;
+                evento.Email = eventoEdit.Email;
                 _repository.Update(evento);
                 await _repository.SaveChangesAsync();            
-                return Created($"/api/evento/{evento.Id}", evento);
+                return Created($"/api/evento/{evento.Id}", evento);           
             }
             catch(System.Exception)
             {

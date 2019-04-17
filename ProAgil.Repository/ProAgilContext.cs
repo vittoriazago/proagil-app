@@ -6,7 +6,10 @@ namespace ProAgil.Repository.Data
     public class ProAgilContext : DbContext
     {
         public ProAgilContext(DbContextOptions<ProAgilContext> options)
-                : base(options)  { }
+                : base(options)  
+        {    
+            //Database.Log = sql => Debug.Write(sql);
+        }
         public DbSet<Evento> Eventos { get; set; }
         public DbSet<Lote> Lotes { get; set; }
         public DbSet<Palestrante> Palestrantes { get; set; }
@@ -15,6 +18,7 @@ namespace ProAgil.Repository.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder){
 
+            //modelBuilder.UseLazyLoadingProxies();
             modelBuilder.Entity<PalestranteEvento>()
                 .HasKey(pe => new {pe.PalestranteId, pe.EventoId});
         }

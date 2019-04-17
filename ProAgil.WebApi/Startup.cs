@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AutoMapper;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +25,7 @@ namespace ProAgil.WebApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            
         }
 
         public IConfiguration Configuration { get; }
@@ -35,8 +37,13 @@ namespace ProAgil.WebApi
                 x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
             );
             
+            services.AddAutoMapper();
             services.AddScoped(typeof(IProAgilRepositorio<>), typeof(ProAgilRepository<>));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(
+                    options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
             services.AddCors();
             // Configurando o serviço de documentação do Swagger
             services.AddSwaggerGen(c =>
