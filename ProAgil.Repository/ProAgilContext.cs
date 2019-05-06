@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using ProAgil.Domain.Identity;
 using ProAgil.Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace ProAgil.Repository.Data
 {
