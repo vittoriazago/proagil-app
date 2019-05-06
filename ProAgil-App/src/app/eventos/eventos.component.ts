@@ -32,6 +32,7 @@ export class EventosComponent implements OnInit {
 
   file: File;
   fileNameToUpdate: string;
+  dataAtual: string;
 
   _filtroLista = '';
 
@@ -136,15 +137,18 @@ export class EventosComponent implements OnInit {
   }
   uploadImagem() {
     if (this.modoSalvar === 'post') {
-      const nomeArquivo = this.evento.imagemURL.split('\\');
-      const nomeFinal = nomeArquivo[nomeArquivo.length - 1];
-      this.evento.imagemURL = nomeFinal;
-
-      this.eventoService.postUpload(this.file, nomeFinal).subscribe();
-    } else {
-      this.evento.imagemURL = this.fileNameToUpdate;
-      this.eventoService.postUpload(this.file, this.fileNameToUpdate).subscribe();
+      const caminhoArquivo = this.evento.imagemURL.split('\\');
+      this.fileNameToUpdate = caminhoArquivo[caminhoArquivo.length - 1];
     }
+    this.evento.imagemURL = this.fileNameToUpdate;
+
+    this.eventoService.postUpload(this.file, this.fileNameToUpdate)
+      .subscribe(
+        () => {
+          this.dataAtual = new Date().getMilliseconds().toString();
+          this.getEventos();
+        }
+      );
   }
 
   validation() {
