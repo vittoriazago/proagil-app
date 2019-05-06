@@ -1,9 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using ProAgil.Domain.Identity;
 using ProAgil.Domain;
 
 namespace ProAgil.Repository.Data
 {
-    public class ProAgilContext : DbContext
+    public class ProAgilContext : IdentityDbContext<User, Role, int,
+                    IdentityUserClaim<int>, UserRole,
+                    IdentityUserLogin<int>,
+                    IdentityRoleClaim<int>,
+                    IdentityUserToken<int>>
     {
         public ProAgilContext(DbContextOptions<ProAgilContext> options)
                 : base(options)  
@@ -18,7 +24,22 @@ namespace ProAgil.Repository.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder){
 
-            //modelBuilder.UseLazyLoadingProxies();
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<UserRole>(userRole =>
+                {
+                    userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
+                    userRole.HasOne(ur => ur.Role)
+                            .WithMany(r => r.UserRoles)
+                            .HasForeignKey(ur => ur.RoleId)
+                            .IsRequired();
+                            
+                    userRole.HasOne(ur => ur.User)
+                            .WithMany(r => r.UserRoles)
+                            .HasForeignKey(ur => ur.UserId)
+                            .IsRequired();
+                }
+            );
+
             modelBuilder.Entity<PalestranteEvento>()
                 .HasKey(pe => new {pe.PalestranteId, pe.EventoId});
         }
