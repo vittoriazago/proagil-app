@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ProAgil.WebApi
 {
@@ -66,8 +67,8 @@ namespace ProAgil.WebApi
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
                             .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
-                        ValidateIssuer = true,
-                        ValidateAudience = true
+                        ValidateIssuer = false,
+                        ValidateAudience = false
                     };
                 });
 
@@ -111,6 +112,7 @@ namespace ProAgil.WebApi
                     Path.Combine(caminhoAplicacao, $"{nomeAplicacao}.xml");
 
                 c.IncludeXmlComments(caminhoXmlDoc);
+                c.OperationFilter<AuthorizationFilter>();
             });
         }
 
@@ -126,6 +128,8 @@ namespace ProAgil.WebApi
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            
+            app.UseAuthentication();
 
             //app.UseHttpsRedirection();
             app.UseCors(x => x.AllowAnyOrigin()
@@ -134,7 +138,6 @@ namespace ProAgil.WebApi
             app.UseStaticFiles();
             app.UseMvc();
 
-            
             // Ativando middlewares para uso do Swagger
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -142,6 +145,27 @@ namespace ProAgil.WebApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json",
                     "ProAgil Service");
             });
+        }
+    }
+
+    public class AuthorizationFilter : IOperationFilter
+    {
+        public void Apply(Operation operation, OperationFilterContext context)
+        {
+            if (operation.Parameters == null)
+                operation.Parameters = new List<IParameter>();
+
+            operation.Parameters.Add(new NonBodyParameter()
+            {
+                Name = "Authorization",
+                In = "header",
+                Type = "string",
+                Required = false
+            });
+        }
+
+        class HeaderParameter : NonBodyParameter
+        {
         }
     }
 }

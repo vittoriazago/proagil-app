@@ -3,6 +3,8 @@ using System.Linq;
 using ProAgil.Domain;
 using ProAgil.WebApi.Models;
 using System.Collections.Generic;
+using ProAgil.Domain.Identity;
+using ProAgil.webapi.Models;
 
 namespace ProAgil.WebApi.Mappings
 {
@@ -26,8 +28,12 @@ namespace ProAgil.WebApi.Mappings
               .ForMember(dest => dest.Eventos, orig => {
                   orig.MapFrom(src => src.PalestrantesEventos
                                          .Select(p => p.Evento));
-              })
-              ;
+              });
+
+            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
+            CreateMap<User, UserLogin>();
+            CreateMap<UserLogin, User>();
         }
 
     }
