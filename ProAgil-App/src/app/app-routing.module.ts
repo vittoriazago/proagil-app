@@ -9,13 +9,14 @@ import { LoginComponent } from './user/login/login.component';
 import { RegistrationComponent } from './user/registration/registration.component';
 
 const routes: Routes = [
-  { path: 'user', component: UserComponent,
+  
+  {
+    path: 'user', component: UserComponent,
     children: [
-      {path: 'login', component: LoginComponent},
-      {path: 'registration', component: RegistrationComponent},
+      { path: 'login', component: LoginComponent },
+      { path: 'registration', component: RegistrationComponent }
     ]
   },
-
   { path: 'eventos', component: EventosComponent },
   { path: 'palestrantes', component: PalestrantesComponent },
   { path: 'contatos', component: ContatosComponent },
