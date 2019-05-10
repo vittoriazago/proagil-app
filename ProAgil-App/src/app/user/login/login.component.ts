@@ -29,6 +29,7 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.model)
       .subscribe(() => {
         this.toastr.success('Logado com sucesso!');
+        this.router.navigate(['/dashboard']);
 
       }, error => {
         this.toastr.error('Falha ao logar!');

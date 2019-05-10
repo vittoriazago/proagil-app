@@ -20,30 +20,34 @@ export class RegistrationComponent implements OnInit {
               public fb: FormBuilder,
               private toastr: ToastrService) {
   }
+
   ngOnInit() {
+    this.validation();
   }
+
   validation() {
-      this.registerForm = this.fb.group({
-        fullname : ['', Validators.required],
-        email : ['', [Validators.required, Validators.email]],
-        username : ['', Validators.required],
-        passwords: this.fb.group({
-          password : ['', [Validators.required, Validators.minLength(4)]],
-          confirmPassword : ['', Validators.required],
-        }, { validators : this.compararSenhas })
-      });
+    this.registerForm = this.fb.group({
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      userName: ['', Validators.required],
+      passwords: this.fb.group({
+        password: ['', [Validators.required, Validators.minLength(4)]],
+        confirmPassword: ['', Validators.required]
+      }, { validator: this.compararSenhas })
+    });
   }
+
   compararSenhas(fb: FormGroup) {
     const confirmSenhaCtrl = fb.get('confirmPassword');
-    if (confirmSenhaCtrl.errors == null
-      || 'mismatch' in confirmSenhaCtrl.errors) {
-        if (fb.get('password').value !== confirmSenhaCtrl.value) {
-          confirmSenhaCtrl.setErrors({ mismatch: true });
-        } else {
-          confirmSenhaCtrl.setErrors(null);
-        }
+    if (confirmSenhaCtrl.errors == null || 'mismatch' in confirmSenhaCtrl.errors) {
+      if (fb.get('password').value !== confirmSenhaCtrl.value) {
+        confirmSenhaCtrl.setErrors({ mismatch: true });
+      } else {
+        confirmSenhaCtrl.setErrors(null);
       }
+    }
   }
+
   cadastrarUsuario() {
     if (this.registerForm.valid) {
       this.user = Object.assign({
@@ -51,22 +55,23 @@ export class RegistrationComponent implements OnInit {
       }, this.registerForm.value);
       this.authService.register(this.user)
       .subscribe(() => {
-        this.router.navigate(['user/login']);
-        this.toastr.success('Inserido com sucesso!');
-      }, error => {
-        const erro = error.error;
-        erro.forEach(element => {
-          switch (element.code) {
-            case 'DuplicateUserName':
-            this.toastr.error('Cadastro Duplicado!');
-            break;
-            default:
-            this.toastr.error(`Erro no Cadatro! CODE: ${element.code}`);
-            break;
-          }
-        });
-      }
+          this.router.navigate(['/user/login']);
+          this.toastr.success('Inserido com sucesso!');
+        }, error => {
+          const erro = error.error;
+          erro.forEach(element => {
+            switch (element.code) {
+              case 'DuplicateUserName':
+                this.toastr.error('Cadastro Duplicado!');
+                break;
+              default:
+                this.toastr.error(`Erro no Cadatro! CODE: ${element.code}`);
+                break;
+            }
+          });
+        }
       );
     }
   }
+
 }
