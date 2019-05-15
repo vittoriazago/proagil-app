@@ -42,6 +42,7 @@ export class EventoEditComponent implements OnInit {
 
   ngOnInit() {
     this.validation();
+    this.carregarEvento();
   }
 
   validation() {
@@ -99,5 +100,28 @@ export class EventoEditComponent implements OnInit {
 
   removerRedeSocial(id: number) {
     this.redesSociais.removeAt(id);
+  }
+
+  carregarEvento() {
+    const idEvento = +this.router.snapshot.paramMap.get('id');
+    this.eventoService.getEvento(idEvento)
+      .subscribe(
+        (evento: Evento) => {
+          this.evento = Object.assign({}, evento);
+          this.fileNameToUpdate = evento.imagemURL.toString();
+
+          this.imagemURL = `http://localhost:5000/resources/img/${this.evento.imagemURL}?_ts=${this.dataAtual}`;
+
+          this.evento.imagemURL = '';
+          this.registerForm.patchValue(this.evento);
+
+          this.evento.lotes.forEach(lote => {
+            this.lotes.push(this.criaLote(lote));
+          });
+          this.evento.redesSociais.forEach(redeSocial => {
+            this.redesSociais.push(this.criaRedeSocial(redeSocial));
+          });
+        }
+      );
   }
 }
